@@ -1,6 +1,13 @@
-# Runs a set of CI jobs for Drupal 8 projects.
+# CircleCI integration with Drupal 8.
 
 # Reusable steps.
+
+## Copies .circle/Robofile to the repository root.
+copy_robo: &copy_robo
+  run:
+    name: Copy RoboFile.php
+    command: cp .circleci/RoboFile.php .
+
 ## Defines images and working directory.
 defaults: &defaults
   docker:
@@ -16,9 +23,9 @@ defaults: &defaults
 
 ## Defines the cache restoring mechanism.
 restore_cache: &restore_cache
-  # We use the composer.json as a way to determine if we can cache our build.
+  # We use the composer.lock as a way to determine if we can cache our build.
   keys:
-  - v1-dependencies-{{ checksum "composer.json" }}
+  - v1-dependencies-{{ checksum "composer.lock" }}
   # fallback to using the latest cache if no exact match is found
   - v1-dependencies-
 
@@ -26,26 +33,20 @@ restore_cache: &restore_cache
 save_cache: &save_cache
   paths:
     - ./vendor
-  key: v1-dependencies-{{ checksum "composer.json" }}
+  key: v1-dependencies-{{ checksum "composer.lock" }}
 
 #Jobs
+
 ## Job to run Unit and Kernel tests.
 unit_kernel_tests: &unit_kernel_tests
   <<: *defaults
   steps:
     - checkout
+    - *copy_robo
     - restore_cache: *restore_cache
     - run:
-        name: Set up and run Unit and Kernel tests
-        command: |
-          apache2-foreground&
-          robo install:dependencies
-          robo setup:drupal || true
-          cp .circleci/config/phpunit.xml web/core/
-          mkdir -p artifacts/phpunit
-          chmod -R 777 artifacts
-          cd web
-          sudo -E -u www-data ../vendor/bin/phpunit -c core --debug --verbose --log-junit ../artifacts/phpunit/phpunit.xml modules/custom
+        name: Run PHPUnit tests
+        command: robo job:run-unit-tests
     - store_test_results:
         path: /var/www/html/artifacts/phpunit
     - store_artifacts:
@@ -57,29 +58,12 @@ behat_tests: &behat_tests
   <<: *defaults
   steps:
     - checkout
+    - *copy_robo
     - restore_cache: *restore_cache
     - run:
-        name: Wait for the database service to be ready
-        command: dockerize -wait tcp://localhost:3306 -timeout 1m
-    - run:
-        name: Install database and run the update path
-        command: |
-          robo install:dependencies
-          robo setup:drupal || true
-          cd web
-          wget -O dump.sql $DB_DUMP_URL
-          ../vendor/bin/drush sql-cli < dump.sql
-          ../vendor/bin/drush updatedb -y -v
-          ../vendor/bin/drush config-import -y -v
-          cd ..
+        name: Run Behat tests
+        command: robo job:run-behat-tests
     - save_cache: *save_cache
-    - run:
-        name: Set up and run Behat tests
-        command: |
-          apache2-foreground&
-          cp .circleci/config/behat.yml tests/
-          chown -R www-data:www-data /var/www/html/web/sites/default/files
-          vendor/bin/behat --verbose -c tests/behat.yml
     - store_test_results:
         path: /var/www/html/artifacts/behat
     - store_artifacts:
@@ -90,15 +74,11 @@ code_sniffer: &code_sniffer
   <<: *defaults
   steps:
     - checkout
+    - *copy_robo
     - restore_cache: *restore_cache
     - run:
-        name: Set up and inspect coding standards
-        command: |
-          robo install:dependencies
-          vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer
-          mkdir -p artifacts/phpcs
-          vendor/bin/phpcs --standard=Drupal --report=junit --report-junit=artifacts/phpcs/phpcs.xml web/modules/custom
-          vendor/bin/phpcs --standard=DrupalPractice --report=junit --report-junit=artifacts/phpcs/phpcs.xml web/modules/custom
+        name: Inspect coding standards
+        command: robo job:check-coding-standards
     - store_test_results:
         path: /var/www/html/artifacts/phpcs
     - store_artifacts:
@@ -110,24 +90,11 @@ code_coverage: &code_coverage
   <<: *defaults
   steps:
     - checkout
+    - *copy_robo
     - restore_cache: *restore_cache
     - run:
-        name: Set up and inspect code coverage
-        environment:
-          SIMPLETEST_BASE_URL: "http://localhost"
-          SIMPLETEST_DB: "sqlite://localhost//tmp/drupal.sqlite"
-          BROWSERTEST_OUTPUT_DIRECTORY: "/var/www/html/sites/simpletest"
-        command: |
-          robo install:dependencies
-          robo setup:drupal || true
-          cp .circleci/config/phpunit.xml web/core/
-          mkdir -p artifacts/coverage-xml
-          mkdir -p artifacts/coverage-html
-          chmod -R 777 artifacts
-          cd web
-          timeout 60m sudo -E -u www-data ../vendor/bin/phpunit --verbose --debug -c core --coverage-xml ../artifacts/coverage-xml --coverage-html ../artifacts/coverage-html --testsuite nonfunctional modules/custom
-          cd ../
-          tar czf artifacts/coverage.tar.gz -C artifacts coverage-html coverage-xml
+        name: Generate code coverage report
+        command: robo job:generate-coverage-report
     - store_artifacts:
         path: /var/www/html/artifacts
     - save_cache: *save_cache
