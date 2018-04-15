@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a6c523dfc7c63939d8c8c20eba9d7a44",
-    "content-hash": "5e7ff8e4bc202300b290dcb5b83b19e7",
+    "hash": "af18e047a646e04e3b8b2d8fb386c3a3",
+    "content-hash": "2e1105cf1b9e51b6c75bb910c214b45a",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -638,6 +638,47 @@
                 "parser"
             ],
             "time": "2014-09-09 13:34:57"
+        },
+        {
+            "name": "drupal/drush",
+            "version": "dev-6.x",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupal.org/project/drush",
+                "reference": "f5453fae788d1827267d0621ea4d76e190771f8f"
+            },
+            "require": {
+                "drupal/core": "~8.0"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-6.x": "6.x-dev"
+                },
+                "drupal": {
+                    "version": "8.x-6.0+1-dev",
+                    "datestamp": "1357606599",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Dev releases are not covered by Drupal security advisories."
+                    }
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "moshe weitzman",
+                    "homepage": "https://www.drupal.org/user/23"
+                }
+            ],
+            "homepage": "https://www.drupal.org/project/drush",
+            "support": {
+                "source": "http://cgit.drupalcode.org/drush"
+            },
+            "time": "2013-08-15 19:32:52"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -5211,6 +5252,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "drupal/drush": 20,
         "drupal/drupal-extension": 20,
         "behat/mink": 20,
         "behat/mink-selenium2-driver": 20
