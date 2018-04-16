@@ -227,12 +227,12 @@ class RoboFile extends \Robo\Tasks
     {
         $tasks = [];
         $tasks[] = $this->taskExecStack()
-            ->exec('vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer');
+            ->exec('phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer');
         $tasks[] = $this->taskFilesystemStack()
             ->mkdir('artifacts/phpcs');
         $tasks[] = $this->taskExecStack()
-            ->exec('vendor/bin/phpcs --standard=Drupal --report=junit --report-junit=artifacts/phpcs/phpcs.xml web/modules/custom')
-            ->exec('vendor/bin/phpcs --standard=DrupalPractice --report=junit --report-junit=artifacts/phpcs/phpcs.xml web/modules/custom');
+            ->exec('phpcs --standard=Drupal --report=junit --report-junit=artifacts/phpcs/phpcs.xml web/modules/custom')
+            ->exec('phpcs --standard=DrupalPractice --report=junit --report-junit=artifacts/phpcs/phpcs.xml web/modules/custom');
         return $tasks;
     }
 
