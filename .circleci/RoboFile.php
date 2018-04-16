@@ -193,7 +193,7 @@ class RoboFile extends \Robo\Tasks
             ->mkdir('artifacts/phpunit', 777);
         $tasks[] = $this->taskExecStack()
             ->dir('web')
-            ->exec('../vendor/bin/phpunit -c core --debug --verbose --log-junit ../artifacts/phpunit/phpunit.xml modules/custom');
+            ->exec('../vendor/bin/phpunit -c ../core --debug --verbose --log-junit ../artifacts/phpunit/phpunit.xml modules/custom');
         return $tasks;
     }
 
@@ -213,7 +213,7 @@ class RoboFile extends \Robo\Tasks
             ->mkdir('artifacts/coverage-html', 777);
         $tasks[] = $this->taskExecStack()
             ->dir('web')
-            ->exec('../vendor/bin/phpunit -c core --debug --verbose --coverage-xml ../artifacts/coverage-xml --coverage-html ../artifacts/coverage-html modules/custom');
+            ->exec('../vendor/bin/phpunit -c ../core --debug --verbose --coverage-xml ../artifacts/coverage-xml --coverage-html ../artifacts/coverage-html modules/custom');
         return $tasks;
     }
 
