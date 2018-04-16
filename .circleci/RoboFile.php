@@ -186,7 +186,7 @@ class RoboFile extends \Robo\Tasks
      */
     protected function runUnitTests()
     {
-        $force = true;
+       /* $force = true;
         $tasks = [];
         $tasks[] = $this->taskFilesystemStack()
             ->copy('.circleci/config/phpunit.xml', 'web/core/phpunit.xml', $force)
@@ -194,7 +194,7 @@ class RoboFile extends \Robo\Tasks
         $tasks[] = $this->taskExecStack()
             ->dir('web')
             ->exec('../vendor/bin/phpunit -c ../core --debug --verbose --log-junit ../artifacts/phpunit/phpunit.xml modules/custom');
-        return $tasks;
+        return $tasks;*/
     }
 
     /**
@@ -205,7 +205,7 @@ class RoboFile extends \Robo\Tasks
      */
     protected function runUnitTestsWithCoverage()
     {
-        $force = true;
+/*        $force = true;
         $tasks = [];
         $tasks[] = $this->taskFilesystemStack()
             ->copy('.circleci/config/phpunit.xml', 'web/core/phpunit.xml', $force)
@@ -214,7 +214,7 @@ class RoboFile extends \Robo\Tasks
         $tasks[] = $this->taskExecStack()
             ->dir('web')
             ->exec('../vendor/bin/phpunit -c ../core --debug --verbose --coverage-xml ../artifacts/coverage-xml --coverage-html ../artifacts/coverage-html modules/custom');
-        return $tasks;
+        return $tasks;*/
     }
 
     /**
